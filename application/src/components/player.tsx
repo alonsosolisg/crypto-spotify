@@ -12,7 +12,7 @@ import { LuShuffle } from "react-icons/lu";
 import { SlLoop } from "react-icons/sl";
 
 const Player = () => {
-  const minutesToSeconds = (minutes) => minutes * 60;
+  const minutesToSeconds = (minutes: number) => minutes * 60;
 
   const songDuration = minutesToSeconds(2.4);
 
@@ -22,7 +22,9 @@ const Player = () => {
   const [songTime, setSongTime] = useState(0);
   const [barHovered, setBarHovered] = useState(false);
 
-  const handleTimeBarClick = (e) => {
+  const handleTimeBarClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const boundingRect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - boundingRect.left;
     const totalWidth = boundingRect.width;
@@ -52,7 +54,7 @@ const Player = () => {
     return () => clearInterval(interval);
   }, [songTime, isPlaying]);
 
-  const formatTime = (time) => {
+  const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
