@@ -60,7 +60,7 @@ const Player = () => {
   useEffect(() => {
     if (songDuration === 0) {
       setLoading(true);
-      setSongDuration(audioRef.current?.duration as number);
+      setSongDuration(audioRef.current?.duration || 0);
     } else {
       setLoading(false);
     }
