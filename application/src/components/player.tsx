@@ -64,7 +64,7 @@ const Player = () => {
     } else {
       setLoading(false);
     }
-  }, [audioRef]);
+  }, [audioRef.current?.duration]);
 
   useEffect(() => {
     let lastUpdateTime = Date.now();
