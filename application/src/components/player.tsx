@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineExpandAlt } from "react-icons/ai";
 import { FaCircleCheck } from "react-icons/fa6";
 import { MdOutlinePauseCircleFilled } from "react-icons/md";
@@ -12,15 +12,34 @@ import { LuShuffle } from "react-icons/lu";
 import { SlLoop } from "react-icons/sl";
 
 const Player = () => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlayPause = () => {
+    const audio = audioRef.current;
+
+    if (audio) {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+
+      setIsPlaying(!audio.paused);
+    }
+  };
   const minutesToSeconds = (minutes: number) => minutes * 60;
 
-  const songDuration = minutesToSeconds(2.4);
+  useEffect(() => {
+    const songDuration = audioRef.current?.duration || 0;
+    setSongDuration(songDuration);
+  }, []);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLooped, setIsLooped] = useState(false);
   const [songTime, setSongTime] = useState(0);
   const [barHovered, setBarHovered] = useState(false);
+  const [songDuration, setSongDuration] = useState(0);
 
   const handleTimeBarClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -31,6 +50,10 @@ const Player = () => {
     const clickPercentage = clickX / totalWidth;
     const newSongTime = clickPercentage * songDuration;
     setSongTime(newSongTime);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = newSongTime;
+    }
   };
 
   useEffect(() => {
@@ -43,7 +66,13 @@ const Player = () => {
         setSongTime((prevSongTime) => prevSongTime + elapsedSeconds);
 
         if (songTime >= songDuration) {
-          setSongTime(0);
+          if (isLooped) {
+            setSongTime(0);
+            handlePlayPause();
+          } else {
+            setSongTime(0);
+            setIsPlaying(false);
+          }
         }
 
         lastUpdateTime = currentTime;
@@ -59,9 +88,11 @@ const Player = () => {
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
-
   return (
     <div className="w-full select-none text-customWhite-900 gap-20 fixed flex justify-evenly items-center p-4 h-fit bottom-0 bg-transparent">
+      <audio ref={audioRef}>
+        <source src="/audio/vivid-dream.mp3" type="audio/mp3" />
+      </audio>
       <div className="h-fit w-[25%] flex gap-4 justify-start items-center">
         <Image
           src="https://i.scdn.co/image/ab67616d00001e02801d5d02ed29edd7c8971423"
@@ -96,12 +127,18 @@ const Player = () => {
           {isPlaying ? (
             <MdOutlinePauseCircleFilled
               className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={() => {
+                setIsPlaying(!isPlaying);
+                handlePlayPause();
+              }}
             />
           ) : (
             <MdOutlinePlayCircleFilled
               className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={() => {
+                setIsPlaying(!isPlaying);
+                handlePlayPause();
+              }}
             />
           )}
           <FaForwardStep className="text-customGray-500 w-5 h-5 hover:scale-105 transition-all hover:text-customWhite-900" />
