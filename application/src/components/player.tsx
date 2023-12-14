@@ -40,6 +40,7 @@ const Player = () => {
   const [songTime, setSongTime] = useState(0);
   const [barHovered, setBarHovered] = useState(false);
   const [songDuration, setSongDuration] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const handleTimeBarClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -55,6 +56,15 @@ const Player = () => {
       audio.currentTime = newSongTime;
     }
   };
+
+  useEffect(() => {
+    if (songDuration === 0) {
+      setLoading(true);
+      setSongDuration(audioRef.current?.duration || 0);
+    } else {
+      setLoading(false);
+    }
+  });
 
   useEffect(() => {
     let lastUpdateTime = Date.now();
@@ -113,76 +123,84 @@ const Player = () => {
           <FaCircleCheck className="text-customGreen-200 w-5 h-5 ml-2 hover:cursor-pointer hover:scale-105" />
         </div>
       </div>
-      <div className="w-[40%] flex flex-col justify-center items-center gap-1 h-full">
-        <div className="w-full flex justify-center items-center gap-4">
-          <LuShuffle
-            onClick={() => setIsShuffled(!isShuffled)}
-            className={` w-5 h-5 hover:scale-105 hover:cursor-pointer transition-all ${
-              isShuffled
-                ? "text-customGreen-200"
-                : "text-customGray-500 hover:text-customWhite-900"
-            }`}
-          />
-          <FaBackwardStep className="text-customGray-500 w-5 h-5 hover:scale-105 transition-all hover:text-customWhite-900" />
-          {isPlaying ? (
-            <MdOutlinePauseCircleFilled
-              className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
-              onClick={() => {
-                setIsPlaying(!isPlaying);
-                handlePlayPause();
-              }}
-            />
-          ) : (
-            <MdOutlinePlayCircleFilled
-              className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
-              onClick={() => {
-                setIsPlaying(!isPlaying);
-                handlePlayPause();
-              }}
-            />
-          )}
-          <FaForwardStep className="text-customGray-500 w-5 h-5 hover:scale-105 transition-all hover:text-customWhite-900" />
-          <SlLoop
-            onClick={() => setIsLooped(!isLooped)}
-            className={`w-5 h-5 hover:scale-105 transition-all ${
-              isLooped
-                ? "text-customGreen-200"
-                : "text-customGray-500 hover:text-customWhite-900"
-            }`}
-          />
+      {loading ? (
+        <div className="w-[40%] flex flex-col justify-center items-center gap-1 h-full">
+          LOADING...
         </div>
-        <div className="w-full flex items-center gap-2">
-          <p className="text-customGray-500 text-xs">{formatTime(songTime)}</p>
-          <div
-            onClick={handleTimeBarClick}
-            onMouseEnter={() => setBarHovered(true)}
-            onMouseLeave={() => setBarHovered(false)}
-            className="relative w-full bg-customWhite-300 my-1 rounded-full h-1"
-          >
-            <div
-              className={` h-1 rounded-full transition-all ${
-                barHovered ? "bg-customGreen-200" : "bg-customWhite-900"
+      ) : (
+        <div className="w-[40%] flex flex-col justify-center items-center gap-1 h-full">
+          <div className="w-full flex justify-center items-center gap-4">
+            <LuShuffle
+              onClick={() => setIsShuffled(!isShuffled)}
+              className={` w-5 h-5 hover:scale-105 hover:cursor-pointer transition-all ${
+                isShuffled
+                  ? "text-customGreen-200"
+                  : "text-customGray-500 hover:text-customWhite-900"
               }`}
-              style={{
-                width: `${(songTime / songDuration) * 100}%`,
-              }}
-            ></div>
-            {barHovered && (
+            />
+            <FaBackwardStep className="text-customGray-500 w-5 h-5 hover:scale-105 transition-all hover:text-customWhite-900" />
+            {isPlaying ? (
+              <MdOutlinePauseCircleFilled
+                className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
+                onClick={() => {
+                  setIsPlaying(!isPlaying);
+                  handlePlayPause();
+                }}
+              />
+            ) : (
+              <MdOutlinePlayCircleFilled
+                className="text-customWhite-900 w-10 h-10 hover:scale-105 transition-all selected:scale-105"
+                onClick={() => {
+                  setIsPlaying(!isPlaying);
+                  handlePlayPause();
+                }}
+              />
+            )}
+            <FaForwardStep className="text-customGray-500 w-5 h-5 hover:scale-105 transition-all hover:text-customWhite-900" />
+            <SlLoop
+              onClick={() => setIsLooped(!isLooped)}
+              className={`w-5 h-5 hover:scale-105 transition-all ${
+                isLooped
+                  ? "text-customGreen-200"
+                  : "text-customGray-500 hover:text-customWhite-900"
+              }`}
+            />
+          </div>
+          <div className="w-full flex items-center gap-2">
+            <p className="text-customGray-500 text-xs">
+              {formatTime(songTime)}
+            </p>
+            <div
+              onClick={handleTimeBarClick}
+              onMouseEnter={() => setBarHovered(true)}
+              onMouseLeave={() => setBarHovered(false)}
+              className="relative w-full bg-customWhite-300 my-1 rounded-full h-1"
+            >
               <div
-                className="absolute w-3 h-3 rounded-full bg-customWhite-900"
+                className={` h-1 rounded-full transition-all ${
+                  barHovered ? "bg-customGreen-200" : "bg-customWhite-900"
+                }`}
                 style={{
-                  left: `${(songTime / songDuration) * 100}%`,
-                  marginLeft: "-8px",
-                  marginTop: "-8px",
+                  width: `${(songTime / songDuration) * 100}%`,
                 }}
               ></div>
-            )}
+              {barHovered && (
+                <div
+                  className="absolute w-3 h-3 rounded-full bg-customWhite-900"
+                  style={{
+                    left: `${(songTime / songDuration) * 100}%`,
+                    marginLeft: "-8px",
+                    marginTop: "-8px",
+                  }}
+                ></div>
+              )}
+            </div>
+            <p className="text-customGray-500 text-xs">
+              {formatTime(songDuration)}
+            </p>
           </div>
-          <p className="text-customGray-500 text-xs">
-            {formatTime(songDuration)}
-          </p>
         </div>
-      </div>
+      )}
       <div className="w-[25%] flex justify-end">
         <AiOutlineExpandAlt className="text-customGray-500 w-6 h-6 hover:scale-105 hover:text-customWhite-900 hover:cursor-pointer" />
       </div>
