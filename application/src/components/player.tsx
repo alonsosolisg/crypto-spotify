@@ -60,11 +60,11 @@ const Player = () => {
   useEffect(() => {
     if (songDuration === 0) {
       setLoading(true);
-      setSongDuration(audioRef.current?.duration || 0);
+      setSongDuration(audioRef.current?.duration as number);
     } else {
       setLoading(false);
     }
-  });
+  }, [songDuration]);
 
   useEffect(() => {
     let lastUpdateTime = Date.now();
