@@ -40,7 +40,7 @@ const Player = () => {
   const [songTime, setSongTime] = useState(0);
   const [barHovered, setBarHovered] = useState(false);
   const [songDuration, setSongDuration] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleTimeBarClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
